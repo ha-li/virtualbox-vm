@@ -1,0 +1,104 @@
+1. Download VirtualBox
+   https://www.virtualbox.org/wiki/Downloads
+   pick your os
+
+
+2. Download xubuntu 14.04.3 (need a bit torrent)
+   The link below is for the 64­bit version (need a bit torrent client)
+   http://cdimage.ubuntu.com/xubuntu/releases/14.04/release/xubuntu-14.04.3-desktop-amd64.iso
+    -move the os from Download into another folder
+
+3. install VirtualBox on your OS
+   
+4. Run VirtualBox and click New, then go to Expert Mode
+   -give it a name (dockersdevops), and set the Type to Linux (64-bit), and the Version to Ubuntu
+   -set it's memory size to 4096 (4 GB) MB or 2048 (2 GB) MB depending on your own configuration.
+    4 GB is sufficient for most development settings
+   -Hard disk set to "Create a virtual hard disk now"
+   -click Create (This will move to another screen)
+
+5. In the next screen, set the file location (you can create a ~/Documents/DockerImages folder for your vdi file
+   -set size to 30 GB (for a developer box)
+   -set hard disk type to VDI (Virutal Disk Image)
+   -set storage on physical hard disk to "Fixed size"
+   -click Create (this will actually create the VDI file on disk)
+
+6. select the VDI and click Settings
+   General tab - set teh Snapshot Folder to a /Users/{userid}/VirtualBox VMs/{imagename}Snapshots
+      Shared clipboard - bidirectional
+      Drag n Drop - bidirectional
+
+   System tab - set Processor to 3 core if you have it
+      
+   Display tab - set Video Memory to 128 MB
+      Monitor count to 1
+      Enable 2D video acceleration
+
+   Network tab - set to Bridge Adapter instead of NAT
+      
+   Shared Folders - will configure later
+
+   click OK
+
+7. Start the VM, it will ask you to provide an OS. 
+   browse to where you saved your OS and select that.
+   click start
+   this will power up the VM
+
+8. Select Install Xubuntu 
+     Check "Download updates will installing"
+     then Continue
+
+9. Select Erase disk and install Xubuntu 
+      then Install Now
+
+10. Select your time zone
+    Select your keyboard language
+    set your user id, computer name, and password
+    set "Require password to log in"
+    click "Continue"
+      this will start the install process
+      once the install is done you will need to restart and hit enter and next screen
+
+11. login to your guest OS, don't need to update the OS, but click on the [Software Updater]
+    to get the latest packages
+
+12. to install guest toosl (to allow big window)
+    after OS reboots, got to 'Devices' menu and select 'Insert Guest Additions CD Image'
+    this will open a folder /media/{userid}/VBox_GAs_5.2.16, go to that folder 
+    with a terminal, and type, 
+       sudo sh ./VBoxLinuxAdditions.run
+       (enter your root password when prompted), this will install guest applications allowing
+       you to open a full size window of the guest OS
+       you'll need to reboot the OS now
+
+13. once the guest OS reboots, you should be able to g to "View" menu and see "Seamless Mode" or
+      "full-screen mode"
+
+14. Seamless Mode allows you to work seamlessly between the guest os and the host os.
+    Includes the ability to copy and paste betwen the 2.
+
+15. Enabling shared folders - in the VirtualBox Manager, go to Settings/Shared Folder
+    (we skipped this earlier in the installation process). 
+    select the + to add a shared folder.
+      -pick the path you want to share (on the host OS eg ~/Document/SharedDrive)    
+      -set the name of the folder on the guest os 
+      -check the Auto-mount and Make Permanent boxes and select OK
+      -after this, the folder is owned by root, you want to make it owned by you, 
+          so open up a terminal and type: 
+              sudo usermod -a -G vboxsf {userid}
+
+      -this will add {userid} to the vboxsf group, allowing them to access the mount without
+       sudo, now restart the guest os.
+
+      -once rebooted, check the mount by cd /media/ you should see a folder sf_host
+      -create a soft link to sf_host so you can access it from your $HOME drive in the guest os
+         sudo ln -s /media/sf_host $HOME/share
+
+      -so ~/share on the guest os points to the shared folder on the host os (~/Document/SharedDrive)
+         you can confirm this by creating a file on your host shared directory, and seeing
+         it in the guest shared directory (you will need to view reload to see on your guest os).
+
+      -enable View Hidden Files in the guest os "View" menu
+
+That's it. you are done.
